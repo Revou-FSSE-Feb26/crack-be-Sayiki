@@ -1,4 +1,30 @@
-import { PartialType } from '@nestjs/mapped-types';
-import { CreateOrderDto } from './create-order.dto';
+import { IsDateString, IsEnum, IsOptional, IsString } from 'class-validator';
+import { BookingStatus } from '@prisma/client';
 
-export class UpdateOrderDto extends PartialType(CreateOrderDto) {}
+export class UpdateOrderDto {
+  @IsOptional()
+  @IsEnum(BookingStatus, {
+    message:
+      'status must be UNPAID, PENDING_ADMIN_VERIFICATION, PAID_WAITING_MODDER, CUSTOMER_SENDING_KEYBOARD, KEYBOARD_IN_MODDER_HAND, SHIPPED_BACK, SUCCESS, or UNDER_DISPUTE',
+  })
+  status?: BookingStatus;
+
+  @IsOptional()
+  @IsDateString(
+    {},
+    { message: 'proposedDate must be a valid ISO-8601 date string' },
+  )
+  proposedDate?: string;
+
+  @IsOptional()
+  @IsString()
+  paymentProof?: string;
+
+  @IsOptional()
+  @IsString()
+  inboundTrackingNum?: string;
+
+  @IsOptional()
+  @IsString()
+  outboundTrackingNum?: string;
+}

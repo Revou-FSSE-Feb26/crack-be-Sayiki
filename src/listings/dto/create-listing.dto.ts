@@ -1,47 +1,60 @@
 import {
+  IsArray,
   IsEnum,
+  IsNotEmpty,
   IsNumber,
   IsOptional,
   IsString,
-  IsArray,
+  IsUUID,
   Min,
+  ValidateNested,
 } from 'class-validator';
+import { Type } from 'class-transformer';
+import { ServiceCategory, ServiceOptionType } from '@prisma/client';
 
-export enum ListingType {
-  SERVICE = 'SERVICE',
-  PRODUCT = 'PRODUCT',
+export class CreateServiceOptionDto {
+  @IsString()
+  @IsNotEmpty({ message: 'Option name is required' })
+  optionName: string;
+
+  @IsEnum(ServiceOptionType, {
+    message:
+      'Option type must be LUBE_TYPE, NEW_SWITCH, ADDON_SERVICE, or FOAM_TYPE',
+  })
+  optionType: ServiceOptionType;
+
+  @IsNumber()
+  @Min(0, { message: 'Extra price must be 0 or greater' })
+  @IsOptional()
+  extraPrice?: number = 0;
 }
 
 export class CreateListingDto {
-  @IsString()
+  @IsUUID('4', { message: 'modderId must be a valid UUID' })
+  @IsNotEmpty({ message: 'modderId is required' })
   modderId: string;
 
-  @IsEnum(ListingType)
-  type: ListingType;
-
   @IsString()
+  @IsNotEmpty({ message: 'Title is required' })
   title: string;
 
   @IsString()
+  @IsNotEmpty({ message: 'Description is required' })
   description: string;
 
   @IsNumber()
-  @Min(0)
+  @Min(0, { message: 'basePrice must be 0 or greater' })
   basePrice: number;
 
-  @IsOptional()
-  @IsString()
-  unitLabel?: string; // e.g. "per switch" or null
+  @IsEnum(ServiceCategory, {
+    message:
+      'Category must be CASE_AND_ACOUSTIC, SWITCH_MODS, STABILIZER_MODS, or CUSTOMIZATION_AESTHETICS',
+  })
+  category: ServiceCategory;
 
   @IsOptional()
-  @IsNumber()
-  stock?: number; // null for services, exact count for ready stock
-
   @IsArray()
-  @IsString({ each: true })
-  tags: string[];
-
-  @IsArray()
-  @IsString({ each: true })
-  images: string[];
+  @ValidateNested({ each: true })
+  @Type(() => CreateServiceOptionDto)
+  options?: CreateServiceOptionDto[];
 }

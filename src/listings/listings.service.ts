@@ -1,18 +1,26 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
 import { CreateListingDto } from './dto/create-listing.dto';
 import { UpdateListingDto } from './dto/update-listing.dto';
-import { ServiceCategory } from '@prisma/client';
 
 @Injectable()
 export class ListingsService {
   constructor(private prisma: PrismaService) {}
 
   async create(createListingDto: CreateListingDto) {
-    const categoryMap: Record<string, ServiceCategory> = {
-      SERVICE: ServiceCategory.SWITCH_MODS,
-      PRODUCT: ServiceCategory.CUSTOMIZATION_AESTHETICS,
-    };
+    const modder = await this.prisma.user.findUnique({
+      where: { id: createListingDto.modderId },
+    });
+
+    if (!modder) {
+      throw new BadRequestException(
+        `Modder with ID ${createListingDto.modderId} does not exist`,
+      );
+    }
 
     return this.prisma.service.create({
       data: {
@@ -20,7 +28,29 @@ export class ListingsService {
         title: createListingDto.title,
         description: createListingDto.description,
         basePrice: createListingDto.basePrice,
-        category: categoryMap[createListingDto.type],
+        category: createListingDto.category,
+        options:
+          createListingDto.options && createListingDto.options.length > 0
+            ? {
+                create: createListingDto.options.map((opt) => ({
+                  optionName: opt.optionName,
+                  optionType: opt.optionType,
+                  extraPrice: opt.extraPrice ?? 0,
+                })),
+              }
+            : undefined,
+      },
+      include: {
+        modder: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            locationCity: true,
+            avgRating: true,
+          },
+        },
+        options: true,
       },
     });
   }
@@ -29,10 +59,12 @@ export class ListingsService {
     return this.prisma.service.findMany({
       include: {
         modder: {
-          include: {
-            services: {
-              select: { id: true, title: true },
-            },
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            locationCity: true,
+            avgRating: true,
           },
         },
         options: true,
@@ -43,30 +75,49 @@ export class ListingsService {
   async findOne(id: string) {
     const listing = await this.prisma.service.findUnique({
       where: { id },
-      include: { modder: true, options: true },
+      include: {
+        modder: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            locationCity: true,
+            avgRating: true,
+          },
+        },
+        options: true,
+      },
     });
-    if (!listing) throw new NotFoundException('Listing not found');
+    if (!listing) throw new NotFoundException(`Listing with ID ${id} not found`);
     return listing;
   }
 
   async update(id: string, updateListingDto: UpdateListingDto) {
+    await this.findOne(id);
+
+    const { options, ...updateData } = updateListingDto;
+
     return this.prisma.service.update({
       where: { id },
-      data: {
-        ...(updateListingDto as any),
-        ...((updateListingDto as any).type
-          ? {
-              category:
-                (updateListingDto as any).type === 'SERVICE'
-                  ? ServiceCategory.SWITCH_MODS
-                  : ServiceCategory.CUSTOMIZATION_AESTHETICS,
-            }
-          : {}),
+      data: updateData,
+      include: {
+        modder: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            locationCity: true,
+            avgRating: true,
+          },
+        },
+        options: true,
       },
     });
   }
 
   async remove(id: string) {
+    await this.findOne(id);
+
     return this.prisma.service.delete({
       where: { id },
     });
