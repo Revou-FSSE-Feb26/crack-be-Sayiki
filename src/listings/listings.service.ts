@@ -9,7 +9,7 @@ import { UpdateListingDto } from './dto/update-listing.dto';
 
 @Injectable()
 export class ListingsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) { }
 
   async create(createListingDto: CreateListingDto) {
     const modder = await this.prisma.user.findUnique({
@@ -32,12 +32,12 @@ export class ListingsService {
         options:
           createListingDto.options && createListingDto.options.length > 0
             ? {
-                create: createListingDto.options.map((opt) => ({
-                  optionName: opt.optionName,
-                  optionType: opt.optionType,
-                  extraPrice: opt.extraPrice ?? 0,
-                })),
-              }
+              create: createListingDto.options.map((opt) => ({
+                optionName: opt.optionName,
+                optionType: opt.optionType,
+                extraPrice: opt.extraPrice ?? 0,
+              })),
+            }
             : undefined,
       },
       include: {
