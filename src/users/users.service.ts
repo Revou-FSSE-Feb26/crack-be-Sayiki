@@ -55,7 +55,14 @@ export class UsersService {
         bookingsAsCustomer: true,
         bookingsAsModder: true,
         reviewsAsCustomer: true,
-        reviewsAsModder: true,
+        reviewsAsModder: {
+          include: {
+            customer: {
+              select: { id: true, name: true, email: true },
+            },
+          },
+          orderBy: { createdAt: 'desc' },
+        },
       },
     });
   }
@@ -77,7 +84,14 @@ export class UsersService {
         bookingsAsCustomer: true,
         bookingsAsModder: true,
         reviewsAsCustomer: true,
-        reviewsAsModder: true,
+        reviewsAsModder: {
+          include: {
+            customer: {
+              select: { id: true, name: true, email: true },
+            },
+          },
+          orderBy: { createdAt: 'desc' },
+        },
       },
     });
     if (!user) throw new NotFoundException('User not found');
