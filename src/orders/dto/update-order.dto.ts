@@ -1,4 +1,4 @@
-import { IsDateString, IsEnum, IsOptional, IsString } from 'class-validator';
+import { IsBoolean, IsDateString, IsEnum, IsOptional, IsString } from 'class-validator';
 import { BookingStatus } from '@prisma/client';
 
 export class UpdateOrderDto {
@@ -27,4 +27,15 @@ export class UpdateOrderDto {
   @IsOptional()
   @IsString()
   outboundTrackingNum?: string;
+
+  @IsOptional()
+  @IsBoolean()
+  isDisbursed?: boolean;
+
+  @IsOptional()
+  @IsDateString(
+    {},
+    { message: 'disbursedAt must be a valid ISO-8601 date string' },
+  )
+  disbursedAt?: string;
 }

@@ -115,6 +115,8 @@ model Booking {
   paymentProof        String?
   inboundTrackingNum  String?
   outboundTrackingNum String?
+  isDisbursed         Boolean            @default(false)
+  disbursedAt         DateTime?
   items               BookingItem[]
   review              Review?
 

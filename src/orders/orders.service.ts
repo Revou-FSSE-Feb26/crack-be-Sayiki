@@ -160,6 +160,12 @@ export class OrdersService {
         paymentProof: updateOrderDto.paymentProof,
         inboundTrackingNum: updateOrderDto.inboundTrackingNum,
         outboundTrackingNum: updateOrderDto.outboundTrackingNum,
+        isDisbursed: updateOrderDto.isDisbursed !== undefined ? updateOrderDto.isDisbursed : undefined,
+        disbursedAt: updateOrderDto.disbursedAt
+          ? new Date(updateOrderDto.disbursedAt)
+          : updateOrderDto.isDisbursed
+          ? new Date()
+          : undefined,
       },
       include: {
         customer: { select: { id: true, name: true, email: true } },
