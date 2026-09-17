@@ -86,11 +86,20 @@ export class OrdersService {
     });
   }
 
-  async findAll() {
+  async findAll(filter?: { customerId?: string; modderId?: string }) {
+    const where: any = {};
+    if (filter?.customerId) {
+      where.customerId = filter.customerId;
+    }
+    if (filter?.modderId) {
+      where.modderId = filter.modderId;
+    }
+
     return this.prisma.booking.findMany({
+      where,
       include: {
-        customer: { select: { id: true, name: true, email: true } },
-        modder: { select: { id: true, name: true, email: true } },
+        customer: { select: { id: true, name: true, email: true, locationCity: true } },
+        modder: { select: { id: true, name: true, email: true, locationCity: true } },
         items: {
           include: {
             service: { select: { id: true, title: true, basePrice: true } },
