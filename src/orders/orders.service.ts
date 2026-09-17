@@ -4,6 +4,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import { BookingStatus } from '@prisma/client';
 import { PrismaService } from '../prisma.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
@@ -56,6 +57,9 @@ export class OrdersService {
         deliveryMethod: createOrderDto.deliveryMethod,
         totalPrice: createOrderDto.totalPrice,
         bookingDate,
+        status: createOrderDto.paymentProof
+          ? BookingStatus.PENDING_ADMIN_VERIFICATION
+          : BookingStatus.UNPAID,
         proposedDate: createOrderDto.proposedDate
           ? new Date(createOrderDto.proposedDate)
           : null,
