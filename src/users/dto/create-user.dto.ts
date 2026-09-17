@@ -1,4 +1,5 @@
 import {
+  IsBoolean,
   IsEmail,
   IsEnum,
   IsNotEmpty,
@@ -28,4 +29,8 @@ export class CreateUserDto {
   @IsString()
   @IsNotEmpty()
   locationCity: string;
+
+  @IsBoolean()
+  @IsOptional()
+  isVerified?: boolean;
 }
