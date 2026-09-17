@@ -11,6 +11,7 @@ import {
 import { OrdersService } from './orders.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
+import { CreateReviewDto } from './dto/create-review.dto';
 
 @Controller('orders')
 export class OrdersController {
@@ -37,6 +38,14 @@ export class OrdersController {
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateOrderDto: UpdateOrderDto) {
     return this.ordersService.update(id, updateOrderDto);
+  }
+
+  @Post(':id/review')
+  addReview(
+    @Param('id') id: string,
+    @Body() createReviewDto: CreateReviewDto,
+  ) {
+    return this.ordersService.addReview(id, createReviewDto);
   }
 
   @Delete(':id')

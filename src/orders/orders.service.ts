@@ -8,6 +8,7 @@ import { BookingStatus } from '@prisma/client';
 import { PrismaService } from '../prisma.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
+import { CreateReviewDto } from './dto/create-review.dto';
 
 @Injectable()
 export class OrdersService {
@@ -181,5 +182,52 @@ export class OrdersService {
     return this.prisma.booking.delete({
       where: { id },
     });
+  }
+
+  async addReview(bookingId: string, createReviewDto: CreateReviewDto) {
+    const booking = await this.prisma.booking.findUnique({
+      where: { id: bookingId },
+      include: { review: true },
+    });
+
+    if (!booking) {
+      throw new NotFoundException(`Order with ID ${bookingId} not found`);
+    }
+
+    let review;
+    if (booking.review) {
+      review = await this.prisma.review.update({
+        where: { bookingId },
+        data: {
+          rating: createReviewDto.rating,
+          comment: createReviewDto.comment,
+        },
+      });
+    } else {
+      review = await this.prisma.review.create({
+        data: {
+          bookingId,
+          customerId: createReviewDto.customerId || booking.customerId,
+          modderId: booking.modderId,
+          rating: createReviewDto.rating,
+          comment: createReviewDto.comment,
+        },
+      });
+    }
+
+    // Recalculate and update modder's avgRating
+    const allModderReviews = await this.prisma.review.findMany({
+      where: { modderId: booking.modderId },
+      select: { rating: true },
+    });
+    if (allModderReviews.length > 0) {
+      const avg = allModderReviews.reduce((sum, r) => sum + r.rating, 0) / allModderReviews.length;
+      await this.prisma.user.update({
+        where: { id: booking.modderId },
+        data: { avgRating: parseFloat(avg.toFixed(1)) },
+      });
+    }
+
+    return review;
   }
 }
