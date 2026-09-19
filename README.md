@@ -5,9 +5,21 @@
 
 ---
 
+## 🌐 Live Deployments
+
+| Platform | Role | Live URL |
+|---|---|---|
+| **Frontend Web App** | Vercel Deployment | [https://crack-fe-sayiki.vercel.app](https://crack-fe-sayiki.vercel.app) |
+| **Backend API Service** | Render Deployment | [https://crack-be-sayiki.onrender.com](https://crack-be-sayiki.onrender.com) |
+
+---
+
 ## 📑 Table of Contents
-- [Overview](#-overview)
-- [Architecture & Tech Stack](#-architecture--tech-stack)
+- [Project Description](#-project-description)
+- [List of Features](#-list-of-features)
+- [Tech Stack Used](#-tech-stack-used)
+- [Application Screenshots](#-application-screenshots)
+- [Entity Relationship Diagram (ERD)](#-entity-relationship-diagram-erd)
 - [Security & Authentication Model](#-security--authentication-model)
 - [Role & Permission Matrix](#-role--permission-matrix)
 - [API Endpoints Specification](#-api-endpoints-specification)
@@ -16,36 +28,176 @@
   - [3. Listings & Modding Services (`/listings`)](#3-listings--modding-services-listings)
   - [4. Modder Directory & Portfolios (`/modders`)](#4-modder-directory--portfolios-modders)
   - [5. Orders & Escrow Bookings (`/orders`)](#5-orders--escrow-bookings-orders)
-- [Database Schema & ERD](#-database-schema--erd)
 - [Environment Configuration](#-environment-configuration)
-- [Getting Started & Local Setup](#-getting-started--local-setup)
+- [Installation and Usage Instructions](#-installation-and-usage-instructions)
 - [Testing](#-testing)
 - [Production Deployment](#-production-deployment)
 
 ---
 
-## 🚀 Overview
+## 🚀 Project Description
 
-SwitchLab is a two-sided marketplace connecting mechanical keyboard enthusiasts with verified keyboard modders. The backend handles:
-- **JWT Authentication & Role-Based Access Control**: Strict role separation between `CUSTOMER`, `MODDER`, and `ADMIN`.
-- **Modder Marketplace & Catalog**: Services (lubing, stabilizer tuning, case foaming) and build portfolios.
-- **Escrow Transaction Management**: End-to-end booking flow from payment proof submission, admin verification, tracking logistics, to escrow fund release.
-- **Ratings & Reviews**: Real-time recalculation of modder average ratings upon completed builds.
+**SwitchLab** is an end-to-end mechanical keyboard marketplace and custom service platform connecting keyboard enthusiasts with verified, specialized keyboard modders across Indonesia. 
+
+The backend service acts as the central engine managing secure escrow transactions, tuning package configurations (switch lubing, filming, stabilizer tuning, acoustic foaming), modder portfolio showcases, order tracking lifecycles, and role-based access control. With escrow protection, customer funds are held in trust until the customer receives their custom keyboard and verifies the sound and feel.
 
 ---
 
-## 🛠️ Architecture & Tech Stack
+## ✨ List of Features
 
-| Component | Technology | Description |
-|---|---|---|
-| **Framework** | NestJS 11 | Modular architecture with dependency injection, controllers, services, and pipes |
-| **Language** | TypeScript 5 | Strictly typed codebase across all entities and DTOs |
-| **Database** | PostgreSQL | Hosted on AWS via Supabase pooler |
-| **ORM** | Prisma ORM 7 | Type-safe queries, relations, and migrations |
-| **Authentication** | Passport.js & JWT | Bearer token authentication with zero hardcoded fallbacks |
-| **Password Hashing**| bcryptjs | Salted hashing with 10 rounds |
-| **Validation** | `class-validator` & `class-transformer` | Global validation pipe with payload whitelisting |
-| **Testing** | Jest | Comprehensive unit and controller test suites |
+1. **Authentication & Role-Based Authorization (RBAC)**:
+   - Complete JWT registration and login with bcrypt salted password hashing.
+   - 3 distinct user roles: `CUSTOMER`, `MODDER`, and `ADMIN`.
+   - Hardened JWT signing with zero hardcoded secret fallbacks.
+   - Endpoint guards (`JwtAuthGuard`, `RolesGuard`) with resource ownership verification.
+
+2. **Modder Services & Catalog Management**:
+   - Modders create, update, and publish customization services with add-on options (e.g., Krytox 205g0 lube, Holee mod, sound dampening).
+   - Public marketplace browsing with filtering and search.
+
+3. **Modder Showcase & Directory**:
+   - Verified modder profiles with specialties, tools, and audio sound test clips.
+   - Modder portfolio showcases of completed custom workbench builds.
+
+4. **Escrow Booking Workflow**:
+   - Booking placement with courier or walk-in delivery channels.
+   - Automatic 3-digit verification code generation matching BCA bank statements.
+   - Payment proof receipt submission and admin verification queue.
+   - Milestone tracking (Inbound shipment ➔ Workbench tuning ➔ Sound test ➔ Outbound dispatch ➔ Escrow release).
+
+5. **Disbursements & Reputation System**:
+   - Customer-driven escrow release upon delivery and build confirmation.
+   - Admin payout disbursement system for modder payouts.
+   - Verified customer ratings and reviews with automated modder average rating recalculation.
+
+---
+
+## 🛠️ Tech Stack Used
+
+| Layer | Technology | Version | Purpose |
+|---|---|---|---|
+| **Framework** | NestJS | 11.x | Modular architecture, Dependency Injection, and Guards |
+| **Language** | TypeScript | 5.x | Strong static typing across entities, DTOs, and controllers |
+| **ORM** | Prisma ORM | 7.x | Type-safe database queries, migrations, and relational mapping |
+| **Database** | PostgreSQL (Supabase) | 16.x | Relational database hosted on AWS pooler |
+| **Authentication** | Passport.js + JWT | - | Stateless bearer token authentication & guard validation |
+| **Password Hashing** | bcryptjs | 3.x | One-way password encryption with 10 salt rounds |
+| **Validation** | `class-validator` / `class-transformer` | - | Automated DTO payload whitelisting and input sanitation |
+| **Testing** | Jest | 29.x | Unit and integration test suites |
+| **Hosting** | Render | - | Containerized backend web service deployment |
+
+---
+
+## 📸 Application Screenshots
+
+### 1. Escrow Admin Vault & Verification Queue
+Admin verification queue displaying customer orders, exact bank transfer totals, and 3-digit verification codes matching BCA bank mutation statements.
+![Admin Escrow Vault](docs/screenshots/admin-vault.png)
+
+### 2. Payment Proof & Verification Confirmation
+Customer checkout confirmation screen showing the exact transfer amount with the 3-digit unique escrow verification code and receipt upload status.
+![Payment Verification Confirmation](docs/screenshots/payment-verification.png)
+
+### 3. Escrow Order & Workbench Tracking
+Interactive order lifecycle tracking showing current build stage, modder workbench notes, inbound/outbound logistics numbers, and escrow release action.
+![Escrow Tracking](docs/screenshots/escrow-tracking.png)
+
+### 4. Marketplace Services & Modder Discovery
+Filterable catalog connecting keyboard enthusiasts with verified modders and tuning packages.
+![Marketplace Services](docs/screenshots/marketplace-modders.png)
+
+---
+
+## 📊 Entity Relationship Diagram (ERD)
+
+```mermaid
+erDiagram
+    USER ||--o{ SERVICE : "modder offers"
+    USER ||--o{ PORTFOLIO : "modder builds"
+    USER ||--o{ BOOKING : "customer places"
+    USER ||--o{ BOOKING : "modder assigned"
+    USER ||--o{ REVIEW : "customer writes"
+    USER ||--o{ REVIEW : "modder receives"
+
+    SERVICE ||--o{ SERVICE_OPTION : "has options"
+    SERVICE ||--o{ BOOKING_ITEM : "booked in"
+
+    BOOKING ||--o{ BOOKING_ITEM : "contains items"
+    BOOKING ||--o| REVIEW : "produces"
+
+    USER {
+        string id PK "UUID"
+        string name "Full Name"
+        string email UK "Unique Email"
+        string password "Hashed Password"
+        Role role "CUSTOMER | MODDER | ADMIN"
+        boolean isVerified "Default false"
+        string locationCity "City name"
+        float avgRating "Default 0.0"
+        datetime createdAt
+    }
+
+    SERVICE {
+        string id PK "UUID"
+        string modderId FK "References USER"
+        string title "Service Name"
+        string description "Service details"
+        float basePrice "Base cost"
+        ServiceCategory category "CASE_AND_ACOUSTIC | SWITCH_MODS | STABILIZER_MODS | CUSTOMIZATION_AESTHETICS"
+    }
+
+    SERVICE_OPTION {
+        string id PK "UUID"
+        string serviceId FK "References SERVICE"
+        string optionName "Option label"
+        ServiceOptionType optionType "LUBE_TYPE | NEW_SWITCH | ADDON_SERVICE | FOAM_TYPE"
+        float extraPrice "Additional price"
+    }
+
+    PORTFOLIO {
+        string id PK "UUID"
+        string modderId FK "References USER"
+        string title "Build title"
+        string description "Build description"
+        string imageUrl "Showcase photo"
+        datetime createdAt
+    }
+
+    BOOKING {
+        string id PK "UUID"
+        string customerId FK "References USER"
+        string modderId FK "References USER"
+        string keyboardModel "Keyboard target"
+        BookingDeliveryMethod deliveryMethod "COURIER | WALK_IN"
+        float totalPrice "Exact total with unique code"
+        datetime bookingDate "Scheduled slot"
+        BookingStatus status "UNPAID | PENDING_ADMIN_VERIFICATION | PAID_WAITING_MODDER | CUSTOMER_SENDING_KEYBOARD | KEYBOARD_IN_MODDER_HAND | SHIPPED_BACK | SUCCESS | UNDER_DISPUTE"
+        string paymentProof "Receipt file path"
+        string inboundTrackingNum "Logistics tracking"
+        string outboundTrackingNum "Logistics tracking"
+        boolean isDisbursed "Payout status"
+        datetime disbursedAt
+        datetime createdAt
+    }
+
+    BOOKING_ITEM {
+        string id PK "UUID"
+        string bookingId FK "References BOOKING"
+        string serviceId FK "References SERVICE"
+        json selectedOptions "Selected config options"
+        float subTotal "Item cost"
+    }
+
+    REVIEW {
+        string id PK "UUID"
+        string bookingId FK "References BOOKING"
+        string customerId FK "References USER"
+        string modderId FK "References USER"
+        int rating "1 to 5 stars"
+        string comment "Feedback comment"
+        datetime createdAt
+    }
+```
 
 ---
 
@@ -53,7 +205,7 @@ SwitchLab is a two-sided marketplace connecting mechanical keyboard enthusiasts 
 
 ### 1. No Hardcoded Fallback Secret
 `JWT_SECRET` is strictly enforced at application bootstrap:
-- If `JWT_SECRET` is missing from the environment, the server immediately fails fast with an explicit fatal error.
+- If `JWT_SECRET` is missing from the environment, the server immediately fails fast with an explicit fatal error: `FATAL: JWT_SECRET environment variable is missing and must be configured.`
 - No default or fallback strings are exposed in public source code, preventing unauthorized token forgery.
 
 ### 2. Guards & Decorators
@@ -103,207 +255,44 @@ In addition to role guards, write operations verify that the authenticated user 
 ## 📡 API Endpoints Specification
 
 ### 1. Authentication (`/auth`)
-
-#### `POST /auth/register`
-Create a new user account.
-```json
-// Request Body
-{
-  "name": "Adit Pratama",
-  "email": "adit@example.com",
-  "password": "Password123!",
-  "role": "CUSTOMER",
-  "locationCity": "Jakarta"
-}
-
-// Response (201 Created)
-{
-  "message": "User registered successfully",
-  "user": {
-    "id": "uuid-v4",
-    "name": "Adit Pratama",
-    "email": "adit@example.com",
-    "role": "CUSTOMER",
-    "locationCity": "Jakarta"
-  }
-}
-```
-
-#### `POST /auth/login`
-Authenticate and retrieve a JWT bearer token.
-```json
-// Request Body
-{
-  "email": "adit@example.com",
-  "password": "Password123!"
-}
-
-// Response (200 OK)
-{
-  "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-  "user": {
-    "id": "uuid-v4",
-    "name": "Adit Pratama",
-    "email": "adit@example.com",
-    "role": "CUSTOMER"
-  }
-}
-```
-
-#### `GET /auth/me`
-*Protected: `JwtAuthGuard`*  
-Returns profile details of the authenticated token bearer.
-
----
+- **`POST /auth/register`**: Register a new user (`CUSTOMER` or `MODDER`).
+- **`POST /auth/login`**: Authenticate and retrieve JWT bearer token.
+- **`GET /auth/me`**: Get authenticated user profile (`JwtAuthGuard`).
 
 ### 2. Users Management (`/users`)
-
-| Method | Endpoint | Guard | Allowed Roles | Description |
-|---|---|---|---|---|
-| `GET` | `/users` | `JwtAuthGuard`, `RolesGuard` | `ADMIN` | List all users |
-| `GET` | `/users/:id` | `JwtAuthGuard` | Authenticated | Get user profile by ID |
-| `POST` | `/users` | `JwtAuthGuard`, `RolesGuard` | `ADMIN` | Create user account |
-| `PATCH` | `/users/:id` | `JwtAuthGuard` | Self, `ADMIN` | Update name, city, password |
-| `DELETE`| `/users/:id` | `JwtAuthGuard`, `RolesGuard` | `ADMIN` | Delete user |
-
----
+- **`GET /users`**: List all users (`ADMIN` only).
+- **`GET /users/:id`**: View profile detail by ID (`JwtAuthGuard`).
+- **`POST /users`**: Create user account directly (`ADMIN` only).
+- **`PATCH /users/:id`**: Update profile (`Self` or `ADMIN`).
+- **`DELETE /users/:id`**: Delete user (`ADMIN` only).
 
 ### 3. Listings & Modding Services (`/listings`)
-
-| Method | Endpoint | Guard | Allowed Roles | Description |
-|---|---|---|---|---|
-| `GET` | `/listings` | Public | Anyone | Browse active marketplace services |
-| `GET` | `/listings/:id` | Public | Anyone | View service options and pricing |
-| `POST` | `/listings` | `JwtAuthGuard`, `RolesGuard` | `MODDER`, `ADMIN` | Publish new tuning service |
-| `PATCH` | `/listings/:id` | `JwtAuthGuard`, `RolesGuard` | Owner Modder, `ADMIN`| Update service details or pricing |
-| `DELETE`| `/listings/:id` | `JwtAuthGuard`, `RolesGuard` | Owner Modder, `ADMIN`| Delete service listing |
-
-#### Sample Create Listing Payload:
-```json
-{
-  "title": "Premium Switch Lubing & Filming",
-  "description": "Hand lubed with Krytox 205g0 and Deskeys films for creamy acoustics.",
-  "basePrice": 35000,
-  "category": "SWITCH_MODS",
-  "options": [
-    {
-      "optionName": "Krytox 205g0 + GPL 105",
-      "optionType": "LUBE_TYPE",
-      "extraPrice": 0
-    },
-    {
-      "optionName": "Deskeys Switch Films (0.3mm)",
-      "optionType": "ADDON_SERVICE",
-      "extraPrice": 15000
-    }
-  ]
-}
-```
-
----
+- **`GET /listings`**: Public catalog browse.
+- **`GET /listings/:id`**: Public service details.
+- **`POST /listings`**: Create tuning service (`MODDER`, `ADMIN`).
+- **`PATCH /listings/:id`**: Update tuning service (`Owner Modder`, `ADMIN`).
+- **`DELETE /listings/:id`**: Delete tuning service (`Owner Modder`, `ADMIN`).
 
 ### 4. Modder Directory & Portfolios (`/modders`)
-
-| Method | Endpoint | Guard | Allowed Roles | Description |
-|---|---|---|---|---|
-| `GET` | `/modders` | Public | Anyone | List all modders with portfolios & ratings |
-| `GET` | `/modders/:id` | Public | Anyone | View portfolio build detail |
-| `POST` | `/modders` | `JwtAuthGuard`, `RolesGuard` | `MODDER`, `ADMIN` | Add portfolio showcase build |
-| `PATCH` | `/modders/:id` | `JwtAuthGuard`, `RolesGuard` | Owner Modder, `ADMIN`| Update showcase details |
-| `DELETE`| `/modders/:id` | `JwtAuthGuard`, `RolesGuard` | Owner Modder, `ADMIN`| Remove showcase build |
-
----
+- **`GET /modders`**: Public directory browse.
+- **`GET /modders/:id`**: Public portfolio build detail.
+- **`POST /modders`**: Create showcase build (`MODDER`, `ADMIN`).
+- **`PATCH /modders/:id`**: Update showcase build (`Owner Modder`, `ADMIN`).
+- **`DELETE /modders/:id`**: Delete showcase build (`Owner Modder`, `ADMIN`).
 
 ### 5. Orders & Escrow Bookings (`/orders`)
-
-| Method | Endpoint | Guard | Allowed Roles | Description |
-|---|---|---|---|---|
-| `GET` | `/orders` | `JwtAuthGuard` | Participant, `ADMIN` | List bookings (`CUSTOMER` sees own; `MODDER` sees assigned; `ADMIN` sees all) |
-| `GET` | `/orders/:id` | `JwtAuthGuard` | Participant, `ADMIN` | Get booking status & tracking |
-| `POST` | `/orders` | `JwtAuthGuard`, `RolesGuard` | `CUSTOMER`, `ADMIN` | Place booking with payment proof |
-| `PATCH` | `/orders/:id` | `JwtAuthGuard` | Participant, `ADMIN` | Update booking status, tracking numbers, or disbursement |
-| `POST` | `/orders/:id/review`| `JwtAuthGuard`, `RolesGuard` | Order Customer, `ADMIN`| Submit rating and review after completion |
-| `DELETE`| `/orders/:id` | `JwtAuthGuard`, `RolesGuard` | `ADMIN` | Remove booking |
-
-#### Booking Lifecycle Statuses:
-```text
-UNPAID ➔ PENDING_ADMIN_VERIFICATION ➔ PAID_WAITING_MODDER ➔ CUSTOMER_SENDING_KEYBOARD ➔ KEYBOARD_IN_MODDER_HAND ➔ SHIPPED_BACK ➔ SUCCESS (Escrow Released)
-```
-
----
-
-## 📊 Database Schema & ERD
-
-```mermaid
-erDiagram
-    USER ||--o{ SERVICE : "modder offers"
-    USER ||--o{ PORTFOLIO : "modder builds"
-    USER ||--o{ BOOKING : "customer places"
-    USER ||--o{ BOOKING : "modder assigned"
-    USER ||--o{ REVIEW : "customer writes"
-    USER ||--o{ REVIEW : "modder receives"
-
-    SERVICE ||--o{ SERVICE_OPTION : "has options"
-    SERVICE ||--o{ BOOKING_ITEM : "booked in"
-
-    BOOKING ||--o{ BOOKING_ITEM : "contains items"
-    BOOKING ||--o| REVIEW : "produces"
-
-    USER {
-        string id PK
-        string name
-        string email UK
-        string password
-        Role role
-        boolean isVerified
-        string locationCity
-        float avgRating
-        datetime createdAt
-    }
-
-    SERVICE {
-        string id PK
-        string modderId FK
-        string title
-        string description
-        float basePrice
-        ServiceCategory category
-    }
-
-    BOOKING {
-        string id PK
-        string customerId FK
-        string modderId FK
-        string keyboardModel
-        BookingDeliveryMethod deliveryMethod
-        float totalPrice
-        datetime bookingDate
-        BookingStatus status
-        string paymentProof
-        string inboundTrackingNum
-        string outboundTrackingNum
-        boolean isDisbursed
-        datetime disbursedAt
-        datetime createdAt
-    }
-
-    REVIEW {
-        string id PK
-        string bookingId FK
-        string customerId FK
-        string modderId FK
-        int rating
-        string comment
-        datetime createdAt
-    }
-```
+- **`GET /orders`**: List user bookings (`CUSTOMER` sees own; `MODDER` sees assigned; `ADMIN` sees all).
+- **`GET /orders/:id`**: View booking details & tracking (`Participant`, `ADMIN`).
+- **`POST /orders`**: Place escrow booking (`CUSTOMER`, `ADMIN`).
+- **`PATCH /orders/:id`**: Update status, tracking, or disbursement (`Participant`, `ADMIN`).
+- **`POST /orders/:id/review`**: Rate & review modder (`Order Customer`, `ADMIN`).
+- **`DELETE /orders/:id`**: Delete booking (`ADMIN` only).
 
 ---
 
 ## ⚙️ Environment Configuration
 
-Copy `.env.example` to `.env` and supply the values:
-
+Copy `.env.example` to `.env`:
 ```bash
 cp .env.example .env
 ```
@@ -311,55 +300,55 @@ cp .env.example .env
 | Variable | Required | Description | Example |
 |---|:---:|---|---|
 | `DATABASE_URL` | **Yes** | PostgreSQL connection string (Supabase / local) | `postgresql://postgres:pass@host:5432/db` |
-| `JWT_SECRET` | **Yes** | Cryptographic secret for signing tokens (min 32 chars) | `your_secure_random_string_min_32_chars` |
-| `JWT_EXPIRES_IN`| No | Token lifespan (default `7d`) | `7d`, `24h`, `30d` |
+| `JWT_SECRET` | **Yes** | Cryptographic secret for signing tokens (min 32 chars) | `c695a46a228875ecf1cc01278b3da4b82...` |
+| `JWT_EXPIRES_IN`| No | Token lifespan (default `7d`) | `7d` |
 | `PORT` | No | HTTP server port (default `3001`) | `3001` |
-
-> ⚠️ **Security Warning**: The backend refuses to start if `JWT_SECRET` is missing. Never commit `.env` containing production secrets to public repositories.
 
 ---
 
-## 💻 Getting Started & Local Setup
+## 💻 Installation and Usage Instructions
 
 ### 1. Prerequisites
 - **Node.js**: v18.0.0 or higher (v20+ recommended)
 - **npm**: v9.0.0 or higher
-- **PostgreSQL**: Local instance or Supabase database
+- **PostgreSQL**: PostgreSQL database instance (local or Supabase)
 
-### 2. Installation
+### 2. Clone & Install Dependencies
 ```bash
-# Clone the repository
 git clone https://github.com/Revou-FSSE-Feb26/crack-be-Sayiki.git
 cd crack-be-Sayiki
-
-# Install dependencies
 npm install
 ```
 
-### 3. Database Synchronization
+### 3. Setup Database with Prisma
 ```bash
-# Push Prisma schema to the database
+# Push schema to database
 npx prisma db push
 
-# Generate Prisma Client
+# Generate Prisma client
 npx prisma generate
 
-# Seed sample users, modders, services, and bookings
+# Seed sample data (users, modders, services, bookings, reviews)
 npm run seed
 ```
 
-### 4. Run the Development Server
+### 4. Running the Application
 ```bash
+# Development mode with hot-reload
 npm run start:dev
+
+# Production build and run
+npm run build
+npm run start:prod
 ```
-The API will be available at: `http://localhost:3001`
+The server will start at `http://localhost:3001`.
 
 ---
 
 ## 🧪 Testing
 
 ```bash
-# Run all unit tests
+# Run unit tests
 npm test
 
 # Run tests in watch mode
@@ -369,27 +358,19 @@ npm run test:watch
 npm run test:cov
 ```
 
-**Test Suite Coverage**:
-- Controller Unit Tests (`Users`, `Listings`, `Modders`, `Orders`, `Auth`, `Products`, `App`)
-- Service Unit Tests (`UsersService`, `ListingsService`, `ModdersService`, `OrdersService`, `AuthService`, `ProductsService`)
-
 ---
 
 ## 🚢 Production Deployment
 
-1. **Build the Production Bundle**:
-   ```bash
-   npm run build
-   ```
-2. **Configure Environment Variables in Hosting Dashboard** (e.g. Render, Railway, AWS):
-   - Set `DATABASE_URL` pointing to your hosted database.
-   - Set `JWT_SECRET` to a cryptographically secure string.
-   - Set `JWT_EXPIRES_IN` to `7d`.
-   - Set `NODE_ENV` to `production`.
-3. **Start Command**:
-   ```bash
-   npm run start:prod
-   ```
+1. Push your changes to GitHub `main` branch.
+2. Link the repository in your cloud provider (e.g. **Render**).
+3. Set the following environment variables in the dashboard:
+   - `DATABASE_URL`
+   - `JWT_SECRET`
+   - `JWT_EXPIRES_IN=7d`
+   - `NODE_ENV=production`
+4. Set Build Command: `npm install && npm run build`
+5. Set Start Command: `npm run start:prod`
 
 ---
 
