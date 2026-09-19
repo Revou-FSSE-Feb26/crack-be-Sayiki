@@ -110,6 +110,9 @@ Filterable catalog connecting keyboard enthusiasts with verified modders and tun
 
 ## 📊 Entity Relationship Diagram (ERD)
 
+![SwitchLab Entity Relationship Diagram](docs/erd.png)
+
+### Database Relations & Schema Specifications
 ```mermaid
 erDiagram
     USER ||--o{ SERVICE : "modder offers"
