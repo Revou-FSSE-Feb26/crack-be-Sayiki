@@ -82,6 +82,7 @@ model Service {
   description String
   basePrice   Float
   category    ServiceCategory
+  imageUrl    String?
   options     ServiceOption[]
   bookingItems BookingItem[]
 

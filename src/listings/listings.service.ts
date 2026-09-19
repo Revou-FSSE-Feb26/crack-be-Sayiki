@@ -29,6 +29,7 @@ export class ListingsService {
         description: createListingDto.description,
         basePrice: createListingDto.basePrice,
         category: createListingDto.category,
+        imageUrl: createListingDto.imageUrl,
         options:
           createListingDto.options && createListingDto.options.length > 0
             ? {
