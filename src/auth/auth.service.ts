@@ -1,5 +1,6 @@
 import {
   ConflictException,
+  ForbiddenException,
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
@@ -27,6 +28,14 @@ export class AuthService {
       throw new ConflictException('Email is already registered');
     }
 
+    // SECURITY: Registration as ADMIN is strictly prohibited to prevent privilege escalation!
+    if ((registerDto.role as any) === 'ADMIN' || registerDto.role === Role.ADMIN) {
+      throw new ForbiddenException('Registration as ADMIN is strictly forbidden');
+    }
+
+    // Whitelist assigned role: only MODDER or CUSTOMER (default: CUSTOMER)
+    const assignedRole = registerDto.role === Role.MODDER ? Role.MODDER : Role.CUSTOMER;
+
     const saltRounds = 10;
     const hashedPassword = await bcrypt.hash(registerDto.password, saltRounds);
 
@@ -35,7 +44,7 @@ export class AuthService {
         name: registerDto.name,
         email: registerDto.email,
         password: hashedPassword,
-        role: registerDto.role ?? Role.CUSTOMER,
+        role: assignedRole,
         locationCity: registerDto.locationCity,
       },
       select: {

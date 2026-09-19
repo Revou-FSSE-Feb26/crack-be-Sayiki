@@ -53,7 +53,7 @@ export class UsersController {
         'You are not authorized to update another user profile',
       );
     }
-    return this.usersService.update(id, updateUserDto);
+    return this.usersService.update(id, updateUserDto, user);
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)

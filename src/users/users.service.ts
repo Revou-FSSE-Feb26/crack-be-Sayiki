@@ -98,12 +98,24 @@ export class UsersService {
     return user;
   }
 
-  async update(id: string, updateUserDto: UpdateUserDto) {
+  async update(id: string, updateUserDto: UpdateUserDto, requestingUser?: any) {
     await this.findOne(id);
 
-    const dataToUpdate: any = { ...updateUserDto };
-    if (dataToUpdate.password) {
-      dataToUpdate.password = await bcrypt.hash(dataToUpdate.password, 10);
+    const isAdmin = requestingUser?.role === 'ADMIN';
+
+    // Whitelist fields: non-admin users can ONLY update profile details, NEVER role or isVerified!
+    const dataToUpdate: any = {};
+    if (updateUserDto.name !== undefined) dataToUpdate.name = updateUserDto.name;
+    if (updateUserDto.email !== undefined) dataToUpdate.email = updateUserDto.email;
+    if (updateUserDto.locationCity !== undefined) dataToUpdate.locationCity = updateUserDto.locationCity;
+    if (updateUserDto.password) {
+      dataToUpdate.password = await bcrypt.hash(updateUserDto.password, 10);
+    }
+
+    // Strictly restrict role and verification changes to ADMIN only
+    if (isAdmin) {
+      if (updateUserDto.role !== undefined) dataToUpdate.role = updateUserDto.role;
+      if (updateUserDto.isVerified !== undefined) dataToUpdate.isVerified = updateUserDto.isVerified;
     }
 
     return this.prisma.user.update({
