@@ -38,6 +38,35 @@ export class ModdersService {
     });
   }
 
+  async findDirectory() {
+    return this.prisma.user.findMany({
+      where: { role: 'MODDER' },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true,
+        isVerified: true,
+        locationCity: true,
+        avgRating: true,
+        createdAt: true,
+        portfolios: true,
+        services: true,
+        bookingsAsModder: {
+          select: { id: true, status: true },
+        },
+        reviewsAsModder: {
+          include: {
+            customer: {
+              select: { id: true, name: true },
+            },
+          },
+        },
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+  }
+
   async findAll() {
     return this.prisma.portfolio.findMany({
       include: {
@@ -56,6 +85,33 @@ export class ModdersService {
   }
 
   async findOne(id: string) {
+    // 1. Try finding by modder user ID
+    const modderUser = await this.prisma.user.findFirst({
+      where: { id, role: 'MODDER' },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true,
+        isVerified: true,
+        locationCity: true,
+        avgRating: true,
+        createdAt: true,
+        portfolios: true,
+        services: true,
+        reviewsAsModder: {
+          include: {
+            customer: { select: { id: true, name: true } },
+          },
+        },
+      },
+    });
+
+    if (modderUser) {
+      return modderUser;
+    }
+
+    // 2. Otherwise find by portfolio ID
     const portfolio = await this.prisma.portfolio.findUnique({
       where: { id },
       include: {
@@ -66,13 +122,14 @@ export class ModdersService {
             locationCity: true,
             email: true,
             avgRating: true,
+            isVerified: true,
           },
         },
       },
     });
 
     if (!portfolio) {
-      throw new NotFoundException(`Portfolio item with ID ${id} not found`);
+      throw new NotFoundException(`Modder or portfolio item with ID ${id} not found`);
     }
 
     return portfolio;

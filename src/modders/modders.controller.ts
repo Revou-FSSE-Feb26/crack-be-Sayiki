@@ -31,6 +31,11 @@ export class ModdersController {
     return this.moddersService.create(createModderDto);
   }
 
+  @Get('directory')
+  findDirectory() {
+    return this.moddersService.findDirectory();
+  }
+
   @Get()
   findAll() {
     return this.moddersService.findAll();
@@ -49,7 +54,7 @@ export class ModdersController {
     @Body() updateModderDto: UpdateModderDto,
     @CurrentUser() user: any,
   ) {
-    const portfolio = await this.moddersService.findOne(id);
+    const portfolio: any = await this.moddersService.findOne(id);
     if (user?.role !== 'ADMIN' && portfolio.modderId !== user?.id) {
       throw new ForbiddenException(
         'You are not authorized to update this portfolio item',
@@ -62,7 +67,7 @@ export class ModdersController {
   @Roles('MODDER', 'ADMIN')
   @Delete(':id')
   async remove(@Param('id') id: string, @CurrentUser() user: any) {
-    const portfolio = await this.moddersService.findOne(id);
+    const portfolio: any = await this.moddersService.findOne(id);
     if (user?.role !== 'ADMIN' && portfolio.modderId !== user?.id) {
       throw new ForbiddenException(
         'You are not authorized to delete this portfolio item',
