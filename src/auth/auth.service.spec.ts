@@ -79,6 +79,8 @@ describe('AuthService', () => {
         createdAt: new Date(),
       });
 
+      mockJwtService.signAsync.mockResolvedValue('signed-jwt-token');
+
       const result = await service.register({
         name: 'Test User',
         email: 'test@example.com',
